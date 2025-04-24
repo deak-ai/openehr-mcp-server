@@ -1,0 +1,49 @@
+# This Docker Compose configuration is for local testing and development only.
+# Not intended for production deployment.
+name: ehrbase_local
+
+services:
+
+  db:
+    image: postgres:16
+    container_name: ehrbase-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      EHRBASE_USER_ADMIN: ehrbase
+      EHRBASE_PASSWORD_ADMIN: ehrbase
+      EHRBASE_USER: ehrbase_restricted
+      EHRBASE_PASSWORD: ehrbase_restricted
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # to persist the data
+      - ehrbase_volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  ehrbase:
+    image: ehrbase/ehrbase:2.11.0
+    container_name: ehrbase
+
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/ehrbase
+      DB_USER_ADMIN: ehrbase
+      DB_PASS_ADMIN: ehrbase
+      DB_USER: ehrbase_restricted
+      DB_PASS: ehrbase_restricted
+      EHRBASE_AQL_EXPERIMENTAL_AQLONFOLDER_ENABLED: 'true'
+      # Logging configuration for more verbose output
+      LOGGING_LEVEL_ORG_EHRBASE: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_FILTER_COMMONSREQUESTLOGGINGFILTER: DEBUG
+      SPRING_MVC_LOG_REQUEST_DETAILS: 'true'
+      # Enable admin API
+      ADMINAPI_ACTIVE: 'true'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  ehrbase_volume:
+
