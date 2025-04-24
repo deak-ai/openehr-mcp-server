@@ -2,6 +2,7 @@
 
 An MCP (Model Context Protocol) server designed to interface with openEHR REST APIs, specifically the EHRbase implementation. 
 This server enables MCP clients like Claude Desktop to create compositions for openEHR templates and submit them to a server.
+For production grade EHR integration you would want to use an LLM you control yourself.
 
 ## MCP Tools 
 
@@ -150,7 +151,7 @@ The script will output the EHR ID, which you'll need when creating compositions 
 To run the tests, you'll need to install the test dependencies first:
 
 ```bash
-uv pip install -r requirements-test.txt
+pip install -r requirements-test.txt
 ```
 
 After installing the test dependencies and uploading the template, you can run the tests with:
