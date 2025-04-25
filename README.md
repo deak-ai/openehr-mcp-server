@@ -2,7 +2,9 @@
 
 An MCP (Model Context Protocol) server designed to interface with openEHR REST APIs, specifically the EHRbase implementation. 
 This server enables MCP clients like Claude Desktop to create compositions for openEHR templates and submit them to a server.
-For production grade EHR integration you would want to use an LLM you control yourself.
+For production grade EHR integrations you must use an AI Model where you can ensure data privacy.
+
+See https://modelcontextprotocol.io/introduction for more information about MCP.
 
 ## MCP Tools 
 
@@ -50,11 +52,10 @@ Edit your Claude Desktop configuration file (claude_desktop_config.json) and add
         "-i",
         "--rm",
         "--network=host",
+        "-e",
+        "EHRBASE_URL=http://localhost:8080/ehrbase/rest",
         "ctodeakai/openehr-mcp-server:latest"
-      ],
-      "env": {
-        "EHRBASE_URL": "http://localhost:8080/ehrbase/rest"
-      }
+      ]
     }
   }
 }
@@ -172,26 +173,8 @@ Build the Docker image from the project root:
 docker build -t openehr-mcp-server .
 ```
 
+### Running the Docker Container
 
-### Configuring Claude Desktop
-
-
-```json
-{
-  "mcpServers": {
-    "openEHR": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "--network=host",
-        "openehr-mcp-server"
-      ],
-      "env": {
-        "EHRBASE_URL": "http://localhost:8080/ehrbase/rest"
-      }
-    }
-  }
-}
+```bash
+docker run -i --rm --network=host openehr-mcp-server
 ```
