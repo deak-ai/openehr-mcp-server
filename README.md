@@ -110,8 +110,6 @@ For this MCP server to work, you currently require
 
 5. The EHRBase API documentation should be here: http://localhost:8080/ehrbase/swagger-ui/index.html
 
-6. Note that the Docker Compose file creates a custom network called `ehrbase_network` that allows containers to communicate using service names
-
 
 ### Uploading the Vital Signs Template
 
@@ -147,7 +145,7 @@ python scripts/create_ehr.py --subject-id "patient_12345"
 The script will output the EHR ID, which you'll need when creating compositions or using the MCP server.
 
 
-### Running Tests
+### Running the Integration Tests
 
 To run the tests, you'll need to install the test dependencies first:
 
