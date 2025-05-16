@@ -26,7 +26,7 @@ def register_prompts(mcp):
         1: Using the openehr_template_list tool chose the latest one that has vital signs in the name (abort if you don't find a vital sign one)
         2: If there are multiple, ask the user to choose one
         3: Obtain an example composition for that template id using the openehr_template_example_composition tool
-        4. Analyze that example composition about which clinical data will be needed an prompt the user
+        4. Analyze that example composition about which clinical data will be needed and prompt the user
         5. Once you have all the necessary data (you might have to ask a couple of times), use the openehr_compositionc_create tool to create this in the EHR with ID {ehr_id}
 
    """
