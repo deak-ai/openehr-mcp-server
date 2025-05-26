@@ -39,8 +39,11 @@ Ensure you have a running EHRbase server. For running one locally, see below.
 
 ## 2. Configure Claude Desktop
 
-Edit your Claude Desktop configuration file (claude_desktop_config.json; in macOS this is located at ~/Library/Application Support/claude) and add an
-"openEHR" object inside the "mcpServers" object.
+Edit your Claude Desktop configuration file (claude_desktop_config.json) and add an "openEHR" configuration block inside the "mcpServers" section.
+
+This file can usually be found in the following locations:
+* On macOS: ~/Library/Application Support/Claude
+* On Windows: %APPDATA%\Claude
 
 ```json
 {
@@ -62,6 +65,9 @@ Edit your Claude Desktop configuration file (claude_desktop_config.json; in macO
 ```
 
 You can point EHRBASE_URL to your own EHRbase server or use the provided docker-compose setup.
+
+For more information on how to set up Claude Desktop with MCP servers, see https://modelcontextprotocol.io/quickstart/user.
+
 
 # Setup
 
