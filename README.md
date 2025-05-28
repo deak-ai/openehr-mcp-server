@@ -6,6 +6,12 @@ For production grade EHR integrations you must use an AI Model where you can ens
 
 See https://modelcontextprotocol.io/introduction for more information about MCP.
 
+## Version
+
+Current version: **0.1.0**
+
+This project follows semantic versioning. For details on our versioning strategy, see [VERSIONING.md](VERSIONING.md).
+
 ## MCP Tools 
 
 * **openehr_template_list**: List all available openEHR templates from the EHRbase server
@@ -55,8 +61,8 @@ This file can usually be found in the following locations:
         "-i",
         "--rm",
         "--network=host",
-        "-e",
-        "EHRBASE_URL=http://localhost:8080/ehrbase/rest",
+        "-e","EHRBASE_URL=http://localhost:8080/ehrbase/rest",
+        "-e","EHRBASE_JSON_FORMAT=wt_flat",
         "ctodeakai/openehr-mcp-server:latest"
       ]
     }
@@ -65,6 +71,22 @@ This file can usually be found in the following locations:
 ```
 
 You can point EHRBASE_URL to your own EHRbase server or use the provided docker-compose setup.
+
+### JSON Format Configuration
+
+The MCP server supports different JSON serialization formats for interacting with the EHRbase API. You can configure the format using the optional `EHRBASE_JSON_FORMAT` environment variable:
+
+```json
+"-e", "EHRBASE_JSON_FORMAT=wt_flat"
+```
+
+Available format options:
+
+* **wt_flat** (default): Use the simplified data types (SDT) based on the flat web template format
+* **canonical**: Uses the canonical openEHR JSON format consistently across all operations
+* **wt_structured**: SDT based on the structured web template format (currently not working)
+
+
 
 For more information on how to set up Claude Desktop with MCP servers, see https://modelcontextprotocol.io/quickstart/user.
 
