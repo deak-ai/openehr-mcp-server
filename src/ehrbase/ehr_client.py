@@ -9,33 +9,39 @@ This module provides specialized client functionality for EHR operations:
 """
 from utils.logging_utils import get_logger
 from .http_client import EHRbaseHttpClient
+from .format_config import FormatConfig
 
 class EHRClient:
     """Client for EHR-related operations against the EHRbase API."""
     
-    def __init__(self, http_client=None):
+    def __init__(self, http_client=None, format_config=None):
         """
         Initialize the EHR Client.
         
         Args:
             http_client: An optional EHRbaseHttpClient instance for making HTTP requests.
+            format_config: Configuration for JSON format modes
                          If not provided, a new instance will be created.
         """
         self.logger = get_logger("ehr_client")
         self.http_client = http_client or EHRbaseHttpClient()
+        self.format_config = format_config or FormatConfig()
     
-    async def create_ehr(self, ehr_status=None, format_type="json"):
+    async def create_ehr(self, ehr_status=None, format_type=None):
         """
         Create a new EHR in the system.
         
         Args:
             ehr_status: Optional EHR status document as a dict
-            format_type: Format type for the response (default: json)
+            format_type: Format type for the response (optional, uses configuration if not provided)
             
         Returns:
             The created EHR data including the EHR ID
         """
         self.logger.info("Creating new EHR")
+        
+        # Get format type from configuration if not provided
+        format_type = self.format_config.get_ehr_format(format_type)
         
         # POST to /openehr/v1/ehr endpoint
         return await self.http_client.request(
@@ -45,18 +51,21 @@ class EHRClient:
             format_type=format_type
         )
     
-    async def get_ehr(self, ehr_id, format_type="json"):
+    async def get_ehr(self, ehr_id, format_type=None):
         """
         Get an EHR by its ID.
         
         Args:
             ehr_id: The ID of the EHR to retrieve
-            format_type: Format type for the response (default: json)
+            format_type: Format type for the response (optional, uses configuration if not provided)
             
         Returns:
             The EHR data
         """
-        self.logger.info(f"Retrieving EHR with ID {ehr_id}")
+        self.logger.info(f"Retrieving EHR {ehr_id}")
+        
+        # Get format type from configuration if not provided
+        format_type = self.format_config.get_ehr_format(format_type)
         
         # GET to /openehr/v1/ehr/{ehr_id} endpoint
         return await self.http_client.request(
@@ -64,7 +73,7 @@ class EHRClient:
             format_type=format_type
         )
     
-    async def get_ehr_by_subject_id(self, subject_id, subject_namespace, format_type="json"):
+    async def get_ehr_by_subject_id(self, subject_id, subject_namespace, format_type=None):
         """
         Get an EHR by subject ID and namespace.
         
@@ -74,11 +83,16 @@ class EHRClient:
         Args:
             subject_id: The subject ID to search for (required)
             subject_namespace: The subject namespace (required)
-            format_type: Format type for the response (default: json)
+            format_type: Format type for the response (optional, uses configuration if not provided)
             
         Returns:
             The EHR matching the subject criteria
         """
+        self.logger.info(f"Retrieving EHR by subject ID {subject_id} in namespace {subject_namespace}")
+        
+        # Get format type from configuration if not provided
+        format_type = self.format_config.get_ehr_format(format_type)
+        
         if not subject_id or not subject_namespace:
             raise ValueError("Both subject_id and subject_namespace are required")
             
@@ -95,18 +109,21 @@ class EHRClient:
             format_type=format_type
         )
     
-    async def get_ehr_status(self, ehr_id, format_type="json"):
+    async def get_ehr_status(self, ehr_id, format_type=None):
         """
         Get the status of an EHR.
         
         Args:
             ehr_id: The ID of the EHR
-            format_type: Format type for the response (default: json)
+            format_type: Format type for the response (optional, uses configuration if not provided)
             
         Returns:
             The EHR status data
         """
         self.logger.info(f"Retrieving status for EHR {ehr_id}")
+        
+        # Get format type from configuration if not provided
+        format_type = self.format_config.get_ehr_format(format_type)
         
         # GET to /openehr/v1/ehr/{ehr_id}/ehr_status endpoint
         return await self.http_client.request(
@@ -114,7 +131,7 @@ class EHRClient:
             format_type=format_type
         )
     
-    async def update_ehr_status(self, ehr_id, status_data, version_uid=None, format_type="json"):
+    async def update_ehr_status(self, ehr_id, status_data, version_uid=None, format_type=None):
         """
         Update the status of an EHR.
         
@@ -122,12 +139,15 @@ class EHRClient:
             ehr_id: The ID of the EHR
             status_data: The updated EHR status data
             version_uid: The version UID for the If-Match header (required by the API)
-            format_type: Format type for the response (default: json)
+            format_type: Format type for the response (optional, uses configuration if not provided)
             
         Returns:
             The updated EHR status data
         """
         self.logger.info(f"Updating status for EHR {ehr_id}")
+        
+        # Get format type from configuration if not provided
+        format_type = self.format_config.get_ehr_format(format_type)
         
         # If version_uid is not provided, try to extract it from the status_data
         if not version_uid and status_data and "uid" in status_data:
