@@ -2,6 +2,8 @@ from mcp.server.fastmcp import FastMCP
 import json
 import time
 import os
+import argparse
+import sys
 
 # Import custom logging utilities
 from utils.logging_utils import get_logger
@@ -27,6 +29,47 @@ mcp = FastMCP("openEHR MCP Server")
 # Register prompts and resources
 mcp = register_prompts(mcp)
 logger.info("Registered prompts and resources for the openEHR MCP Server")
+
+# TRANSPORT PLUGIN SYSTEM
+class TransportPlugin:
+    """Base class for transport plugins."""
+    
+    def __init__(self, name: str):
+        self.name = name
+    
+    def run(self, mcp_server, **kwargs):
+        """Run the transport with the given MCP server."""
+        raise NotImplementedError("Transport plugins must implement run()")
+
+class StdioTransportPlugin(TransportPlugin):
+    """Standard I/O transport plugin (default behavior)."""
+    
+    def __init__(self):
+        super().__init__("stdio")
+    
+    def run(self, mcp_server, **kwargs):
+        """Run the MCP server with stdio transport."""
+        logger.info("Using stdio transport")
+        mcp_server.run(transport='stdio')
+
+# Global transport registry
+_transport_plugins = {}
+
+def register_transport_plugin(plugin: TransportPlugin):
+    """Register a transport plugin."""
+    _transport_plugins[plugin.name] = plugin
+    logger.info(f"Registered transport plugin: {plugin.name}")
+
+def get_transport_plugin(name: str) -> TransportPlugin:
+    """Get a registered transport plugin by name."""
+    return _transport_plugins.get(name)
+
+def list_transport_plugins():
+    """List all registered transport plugins."""
+    return list(_transport_plugins.keys())
+
+# Register the default stdio transport
+register_transport_plugin(StdioTransportPlugin())
 
 # TOOLS - Actions to perform with templates and EHRs
 @mcp.tool()
@@ -554,9 +597,37 @@ async def openehr_compositions_list(template_id: str) -> str:
 
 # Run the server
 if __name__ == "__main__":
-    # Log the server configuration
-    logger.info("Starting openEHR MCP Server with stdio transport")
+    import argparse
     
-    # Run the server with stdio transport only
-    logger.info("Using stdio transport")
-    mcp.run(transport='stdio')
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='openEHR MCP Server')
+    parser.add_argument('--transport', type=str, default='stdio',
+                        help=f'Transport type (available: {", ".join(list_transport_plugins())})')
+    parser.add_argument('--list-transports', action='store_true',
+                        help='List available transport plugins')
+    
+    args, unknown = parser.parse_known_args()
+    
+    # List available transports if requested
+    if args.list_transports:
+        print("Available transport plugins:")
+        for transport_name in list_transport_plugins():
+            print(f"  - {transport_name}")
+        sys.exit(0)
+    
+    # Log the server configuration
+    logger.info(f"Starting openEHR MCP Server with {args.transport} transport")
+    
+    # Get the transport plugin
+    transport_plugin = get_transport_plugin(args.transport)
+    if not transport_plugin:
+        logger.error(f"Unknown transport: {args.transport}")
+        logger.info(f"Available transports: {', '.join(list_transport_plugins())}")
+        sys.exit(1)
+    
+    # Run with the selected transport
+    try:
+        transport_plugin.run(mcp, **vars(args))
+    except Exception as e:
+        logger.error(f"Error running transport {args.transport}: {e}")
+        sys.exit(1)
