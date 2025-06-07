@@ -19,7 +19,7 @@ ENV PYTHONPATH=/app
 
 # Add version label
 LABEL org.opencontainers.image.version="$(cat VERSION)"
-LABEL org.opencontainers.image.authors="CTO DEAK AI"
+LABEL org.opencontainers.image.authors="cto@deak.ai"
 LABEL org.opencontainers.image.title="OpenEHR MCP Server"
 LABEL org.opencontainers.image.description="Model Context Protocol (MCP) server for OpenEHR integration"
 
