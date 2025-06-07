@@ -1,12 +1,8 @@
-# Core MCP dependencies
-mcp>=1.6.0
+# FastMCP - Complete MCP server framework (v2)
+fastmcp>=2.7.0
 
 # HTTP client for API calls
-httpx>=0.28.1
+httpx>=0.28.0
 
-# Data validation and serialization
-pydantic>=2.11.3
-
-# Utilities
-python-dotenv>=1.1.0
-requests>=2.32.3
+# Environment variables
+python-dotenv>=1.0.0
